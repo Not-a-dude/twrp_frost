@@ -22,6 +22,11 @@ PRODUCT_PACKAGES += \
     update_verifier \
     update_engine_sideload
 
+TARGET_RECOVERY_ROOT_OUT := $(DEVICE_PATH)/recovery/root
+
+PRODUCT_COPY_FILES += \
+    $(foreach f,$(wildcard $(LOCAL_PATH)/recovery/root/system/etc/firmware/*),$(f):$(TARGET_COPY_OUT_RECOVERY)/root/system/etc/firmware/$(notdir $(f)))
+
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 
 PRODUCT_SHIPPING_API_LEVEL := 30

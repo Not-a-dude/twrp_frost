@@ -17,7 +17,6 @@ AB_OTA_PARTITIONS += \
     vendor \
     system_ext \
     system
-BOARD_USES_RECOVERY_AS_BOOT := true
 
 # Architecture
 TARGET_ARCH := arm64
@@ -50,6 +49,7 @@ TW_MAX_BRIGHTNESS := 255
 BOARD_BOOTIMG_HEADER_VERSION := 3
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
 BOARD_KERNEL_IMAGE_NAME := Image
+BOARD_MKBOOTIMG_ARGS += --cmdline "security=selinux androidboot.hardware=jlq iommu.strict=0 firmware_class.path=/etc/firmware swiotlb=2048 rcu_nocbs=0-7 kpti=off rcupdate.rcu_expedited=1 earlycon=uart8250,mmio32,0x3450F000 console=jlqttyS1,115200n8 no_console_suspend loglevel=4 buildvariant=eng androidboot.selinux=permissive"
 TARGET_KERNEL_CONFIG := frost_defconfig
 TARGET_KERNEL_SOURCE := kernel/xiaomi/frost
 
@@ -62,10 +62,16 @@ endif
 # Partitions
 BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 100663296
+BOARD_USES_RECOVERY_AS_BOOT := false
 BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_SYSTEMIMAGE_PARTITION_TYPE := ext4
 BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
+BOARD_MOVE_RECOVERY_RESOURCES_TO_VENDOR_BOOT := true
+BOARD_INCLUDE_RECOVERY_RAMDISK_IN_VENDOR_BOOT := true
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES := $(wildcard $(DEVICE_PATH)/recovery/root/lib/modules/5.4-gki/*.ko)
+BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(shell cat $(DEVICE_PATH)/recovery/root/lib/modules/5.4-gki/modules.load)
 TARGET_COPY_OUT_VENDOR := vendor
 BOARD_SUPER_PARTITION_SIZE := 9126805504 # TODO: Fix hardcoded value
 BOARD_SUPER_PARTITION_GROUPS := xiaomi_dynamic_partitions
@@ -100,3 +106,4 @@ TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_USE_TOOLBOX := true
 TW_INCLUDE_REPACKTOOLS := true
 TW_HAS_NO_RECOVERY_PARTITION := true
+FOX_VIRTUAL_AB_DEVICE := true
