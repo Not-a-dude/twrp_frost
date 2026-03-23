@@ -1,32 +1,26 @@
-# System partition
-/system         ext4     system                                 flags=display=system;logical;slotselect;backup=1;flashimg
+# Android fstab file.
+# <src>                                          <mnt_point>       <type>      <mnt_flags and options>                               <fs_mgr_flags>
+# Logical partitions
+system                                           /system           ext4        ro,barrier=1,discard                                  wait,slotselect,avb=vbmeta_system,logical,first_stage_mount
+system_ext                                       /system_ext       ext4        ro,barrier=1,discard                                  wait,slotselect,avb=vbmeta_system,logical,first_stage_mount
+product                                          /product          ext4        ro,barrier=1,discard                                  wait,slotselect,avb=vbmeta_system,logical,first_stage_mount
+vendor                                           /vendor           ext4        ro,barrier=1,discard                                  wait,slotselect,avb,logical,first_stage_mount
 
-# System_ext partition
-/system_ext     ext4     system_ext                             flags=display=system_ext;logical;slotselect;backup=1;flashimg
+# Physical partitions
+/dev/block/by-name/metadata                      /metadata         ext4        noatime,nosuid,nodev,discard,data=journal             wait,check,formattable,first_stage_mount
+/dev/block/by-name/userdata                      /data             f2fs        noatime,nosuid,nodev,discard,inlinecrypt              latemount,wait,check,formattable,quota,reservedsize=128M,checkpoint=fs,fileencryption=aes-256-xts:aes-256-cts:v2+emmc_optimized,keydirectory=/metadata/vold/metadata_encryption
+/dev/block/by-name/misc                          /misc             emmc        defaults                                              defaults
+/dev/block/by-name/rescue                        /cache            ext4        noatime,nosuid,nodev,barrier=1                        wait,check,formattable
+/dev/block/by-name/persist                       /mnt/vendor/persist ext4      noatime,nosuid,nodev,barrier=1                        wait,check
+/dev/block/by-name/cust                          /cust             ext4        ro,nosuid,nodev,barrier=1                             wait,check
 
-# Product partition
-/product        ext4     product                                flags=display=product;logical;slotselect;backup=1;flashimg
+# Removable media
+/devices/platform/0.soc/34456000.sdhci/mmc_host* auto              vfat        nosuid,nodev                                          wait,voldmanaged=sdcard1:auto
+/devices/platform/0.soc/30740000.usb/usb3* auto              vfat        nosuid,nodev                                          wait,voldmanaged=usbotg:auto
 
-# Vendor partition
-/vendor         ext4     vendor                                 flags=display=vendor;logical;slotselect;backup=1;flashimg
-
-# Metadata partition
-/metadata       ext4     /dev/block/by-name/metadata            flags=display=metadata;backup=1;flashimg
-
-# Data partition (note: F2FS used here)
-<data           f2fs     /dev/block/by-name/userdata            flags=display=data;backup=1;flashimg
-
-# Misc partition
-/misc           emmc     /dev/block/by-name/misc                flags=display=misc;backup=1;flashimg
-
-# SDCard (external storage)
-/sdcard         vfat     /dev/block/mmcblk1p1                   flags=display=sdcard;backup=1;flashimg
-
-# Cust partition
-/cust           ext4     /dev/block/bootdevice/by-name/cust     flags=display=cust;backup=1;flashimg
-
-# Cache partition
-/cache          ext4     /dev/block/by-name/rescue              flags=display=cache;backup=1;flashimg
-
-# External SD partition (if present)
-/external_sd    vfat     /dev/block/mmcblk1p1                   flags=storage;wipeingui;removable
+# Backup/flashing
+/system_image                                    emmc              system                                                            flags=display="System Image";backup=1;flashimg
+/system_ext_image                                emmc              system_ext                                                        flags=display="System_ext Image";backup=1;flashimg
+/product_image                                   emmc              product                                                           flags=display="Product Image";backup=1;flashimg
+/vendor_image                                    emmc              vendor                                                            flags=display="Vendor Image";backup=1;flashimg
+/userdata_image                                  emmc              /dev/block/by-name/userdata                                       flags=display="Userdata Image";backup=1;flashimg
